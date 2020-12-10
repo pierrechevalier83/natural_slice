@@ -1,4 +1,3 @@
 pub mod permutation;
+pub mod position;
 pub mod property;
-
-pub use permutation::{decode_permutation, encode_permutation};

@@ -122,7 +122,4 @@ mod tests {
         shuffled.shuffle(&mut rng);
         assert_eq!(decode_permutation(21021, &shuffled), seq);
     }
-    // TODO: fuzz testing encode decode downcast
-    // No panic!
-    // Make the usize type generic
 }

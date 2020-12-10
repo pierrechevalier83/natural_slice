@@ -1,5 +1,5 @@
 [package]
-name = "rubiks_coordinates"
+name = "natural_slice"
 version = "0.1.0"
 authors = ["Pierre Chevalier <pierrechevalier83@gmail.com>"]
 edition = "2018"
@@ -10,3 +10,4 @@ edition = "2018"
 factorial = "0.2.0"
 rand = "0.7.3"
 radix_fmt = "1.0.0"
+num-integer = "0.1.44"
