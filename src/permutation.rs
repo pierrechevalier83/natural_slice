@@ -109,12 +109,12 @@ mod tests {
     use rand::seq::SliceRandom;
     use rand::thread_rng;
     #[test]
-    fn test_calculate_permutation() {
+    fn test_encode_permutation() {
         let seq = [3, 6, 5, 7, 0, 2, 1, 4];
         assert_eq!(21021, encode_permutation(&seq));
     }
     #[test]
-    fn test_set_permutation() {
+    fn test_decode_permutation() {
         let seq = [3, 6, 5, 7, 0, 2, 1, 4];
 
         let mut rng = thread_rng();
@@ -122,4 +122,7 @@ mod tests {
         shuffled.shuffle(&mut rng);
         assert_eq!(decode_permutation(21021, &shuffled), seq);
     }
+    // TODO: fuzz testing encode decode downcast
+    // No panic!
+    // Make the usize type generic
 }
