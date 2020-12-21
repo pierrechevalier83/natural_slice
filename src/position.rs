@@ -1,8 +1,8 @@
 use num_integer::binomial;
 use std::convert::{TryFrom, TryInto};
 
-/// Encode the position of the interesting elements in a slice to a single natural number.
-/// Note that we don't care about the relative position of the 4 interesting elements, which allows
+/// Encode the position of the interesting elements in a slice as a single natural number.
+/// Note that we don't care about the relative positions of the interesting elements, which allows
 /// us to deal with a smaller number of possibilities.
 ///
 /// In the context of a Rubiks Cube, the calculation is explained with an example here:
@@ -35,7 +35,7 @@ pub fn encode_position<T: Ord, Encoded: TryFrom<usize>>(
 /// Decode the position number of a slice
 /// Returns a Vec<bool> filled with false for all uninteresting elements and true for all
 /// interesting elements.
-/// This Vec can be used a mapping of indices to interesting elements.
+/// This Vec can be used as a mapping of indices to interesting elements.
 pub fn decode_position<ToDecode: TryInto<usize>>(
     position: ToDecode,
     num_interesting: usize,

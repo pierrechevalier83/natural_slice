@@ -79,12 +79,12 @@ impl PermutationCounts {
 /// Encode a slice's permutation from the ordered state as a single number.
 ///
 /// From a slice of up to 20 elements, produce a unique number that represents the order of the
-/// elements in that slice. This number can later be used to
+/// elements in that slice. This number can later be used to reconstitute the original slice
+/// permutation by calling `decode_permutation`.
 ///
 /// This is the most space-efficient way of storing that information as every bit of entropy in the
 /// slice's permutation is represented by a bit in the permutation number.
 /// The maximum possible output is n!, where n is the size of the slice.
-/// The usize can safely be downcast if n! can fit in a smaller integer.
 /// 5! fits in a u8
 /// 8! fits in a u16
 /// 12! fits in a u32
@@ -101,7 +101,7 @@ pub fn encode_permutation<T: Ord, Encoded: TryFrom<usize>>(
 /// element of the set in an arbitrary order.
 ///
 /// Output a Vec with the data ordered in the unique permutation that matches this permutation
-/// number
+/// number.
 pub fn decode_permutation<'a, T: Ord + Clone, ToDecode: TryInto<usize>>(
     permutation: ToDecode,
     data: &'a [T],

@@ -4,8 +4,11 @@ use std::iter::once;
 
 /// Encode a property of a slice of data with finite cardinality into a single number
 /// There must be a mapping from this property to a digit in a certain base
-/// The output is bounded by base^(data.len() - 1)
-/// Preconditions: the property being encoded must have parity
+/// The output is bound by base^(data.len() - 1)
+/// Precondition: the property being encoded must satisfy the parity property, which is
+/// to say that summing all the values of the property should give a multiple of the
+/// base. This is used to omit one "bit" in that base as it can be reconstituted later using
+/// parity.
 pub fn encode_property<T: Ord, Encoded: TryFrom<usize>>(
     data: &[T],
     property_mapping: &dyn Fn(&T) -> u8,
@@ -27,6 +30,11 @@ pub fn encode_property<T: Ord, Encoded: TryFrom<usize>>(
         .try_into()
 }
 
+/// Decode a property number into a unique ordering of this slice's property.
+///
+/// Take as input the property number produced by `encode_property` and the base that was used to
+/// encode it.
+/// Returns a Vec<u8> filled with the value for the property at each position.
 pub fn decode_property<ToDecode: TryInto<usize>>(
     property: ToDecode,
     base: u8,
