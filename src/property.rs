@@ -49,23 +49,29 @@ pub fn decode_property<ToDecode: TryInto<usize>>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    #[test]
-    fn test_encode_property() {
-        let seq = [3, 6, 5, 7, 0, 2, 1, 4];
-        //         2  0  0  1  1  0  0  2
-        let mapping = |x: &u8| match *x {
+    const SEQ: [u8; 8] = [3, 6, 5, 7, 0, 2, 1, 4];
+    const PROP: [u8; 8] = [2, 0, 0, 1, 1, 0, 0, 2];
+    fn mapping(x: &u8) -> u8 {
+        match *x {
             3 | 4 => 2,
             7 | 0 => 1,
             6 | 5 | 2 | 1 => 0,
             _ => panic!("should only be called with values from seq"),
-        };
+        }
+    }
+    #[test]
+    fn test_encode_property() {
         // 2*3^6 + 0*3^5 + 0*3^4 + 1*3^3 +1*3^2 + 0*3^1 + 0*3^0 = 1494
         // The last ternary bit is not encoded as it can be reconstituted by parity:
         // the sum of all terms must be a multiple of the radix
-        assert_eq!(Ok(1494), encode_property(&seq, &mapping, 3));
+        assert_eq!(Ok(1494), encode_property(&SEQ, &mapping, 3));
+    }
+    #[test]
+    fn test_encode_property_fails_with_too_small_type() {
+        assert!(encode_property::<_, u8>(&SEQ, &mapping, 3).is_err());
     }
     #[test]
     fn test_decode_property() {
-        assert_eq!(Ok(vec![2, 0, 0, 1, 1, 0, 0, 2]), decode_property(1494, 3));
+        assert_eq!(Ok(PROP.to_vec()), decode_property(1494, 3));
     }
 }

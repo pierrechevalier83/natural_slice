@@ -114,15 +114,18 @@ mod tests {
     use super::*;
     use rand::seq::SliceRandom;
     use rand::thread_rng;
+    const SEQ: [u8; 8] = [3, 6, 5, 7, 0, 2, 1, 4];
     #[test]
     fn test_encode_permutation() {
-        let seq = [3, 6, 5, 7, 0, 2, 1, 4];
-        assert_eq!(Ok(21021), encode_permutation(&seq));
+        assert_eq!(Ok(21021), encode_permutation(&SEQ));
+    }
+    #[test]
+    fn test_encode_permutation_fails_with_too_small_type() {
+        assert!(encode_permutation::<_, u8>(&SEQ).is_err());
     }
     #[test]
     fn test_decode_permutation() {
-        let seq = vec![3, 6, 5, 7, 0, 2, 1, 4];
-
+        let seq = SEQ.to_vec();
         let mut rng = thread_rng();
         let mut shuffled = seq.clone();
         shuffled.shuffle(&mut rng);

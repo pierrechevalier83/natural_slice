@@ -87,6 +87,13 @@ mod tests {
         }
     }
     #[test]
+    fn test_encode_position_fails_with_too_small_type() {
+        assert!(
+            encode_position::<_, u8>(&[1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], &is_interesting)
+                .is_err()
+        )
+    }
+    #[test]
     fn test_decode_position() {
         for (data, position) in examples().iter() {
             let expected = data.iter().map(is_interesting).collect::<Vec<_>>();
