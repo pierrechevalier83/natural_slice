@@ -1,5 +1,6 @@
 use factorial::Factorial;
 use std::cmp::Ord;
+use std::convert::{TryFrom, TryInto};
 
 struct PermutationCounts {
     // Each count represents the number of items positioned to the left of the value at this index
@@ -88,8 +89,10 @@ impl PermutationCounts {
 /// 8! fits in a u16
 /// 12! fits in a u32
 /// 20! fits in a u64
-pub fn encode_permutation<T: Ord>(data: &[T]) -> usize {
-    PermutationCounts::from_data(data).encode()
+pub fn encode_permutation<T: Ord, Encoded: TryFrom<usize>>(
+    data: &[T],
+) -> Result<Encoded, Encoded::Error> {
+    PermutationCounts::from_data(data).encode().try_into()
 }
 
 /// Decode a permutation number into a unique slice's permutation
@@ -99,8 +102,11 @@ pub fn encode_permutation<T: Ord>(data: &[T]) -> usize {
 ///
 /// Output a Vec with the data ordered in the unique permutation that matches this permutation
 /// number
-pub fn decode_permutation<'a, T: Ord + Clone>(permutation: usize, data: &'a [T]) -> Vec<T> {
-    PermutationCounts::decode(permutation, data.len()).apply(&data)
+pub fn decode_permutation<'a, T: Ord + Clone, ToDecode: TryInto<usize>>(
+    permutation: ToDecode,
+    data: &'a [T],
+) -> Result<Vec<T>, ToDecode::Error> {
+    Ok(PermutationCounts::decode(permutation.try_into()?, data.len()).apply(&data))
 }
 
 #[cfg(test)]
@@ -111,15 +117,15 @@ mod tests {
     #[test]
     fn test_encode_permutation() {
         let seq = [3, 6, 5, 7, 0, 2, 1, 4];
-        assert_eq!(21021, encode_permutation(&seq));
+        assert_eq!(Ok(21021), encode_permutation(&seq));
     }
     #[test]
     fn test_decode_permutation() {
-        let seq = [3, 6, 5, 7, 0, 2, 1, 4];
+        let seq = vec![3, 6, 5, 7, 0, 2, 1, 4];
 
         let mut rng = thread_rng();
         let mut shuffled = seq.clone();
         shuffled.shuffle(&mut rng);
-        assert_eq!(decode_permutation(21021, &shuffled), seq);
+        assert_eq!(decode_permutation(21021, &shuffled), Ok(seq));
     }
 }

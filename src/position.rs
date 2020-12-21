@@ -1,4 +1,5 @@
 use num_integer::binomial;
+use std::convert::{TryFrom, TryInto};
 
 /// Encode the position of the interesting elements in a slice to a single natural number.
 /// Note that we don't care about the relative position of the 4 interesting elements, which allows
@@ -6,8 +7,11 @@ use num_integer::binomial;
 ///
 /// In the context of a Rubiks Cube, the calculation is explained with an example here:
 /// http://kociemba.org/math/UDSliceCoord.htm
-pub fn encode_position<T: Ord>(data: &[T], is_interesting: &dyn Fn(&T) -> bool) -> usize {
-    let mut interesting_to_the_left: usize = 0;
+pub fn encode_position<T: Ord, Encoded: TryFrom<usize>>(
+    data: &[T],
+    is_interesting: &dyn Fn(&T) -> bool,
+) -> Result<Encoded, Encoded::Error> {
+    let mut interesting_to_the_left = 0;
     data.iter()
         .enumerate()
         .map(|(index, x)| {
@@ -24,20 +28,25 @@ pub fn encode_position<T: Ord>(data: &[T], is_interesting: &dyn Fn(&T) -> bool) 
             }
         })
         .map(|(index, interesting_to_the_left)| binomial(index, interesting_to_the_left - 1))
-        .sum()
+        .sum::<usize>()
+        .try_into()
 }
 
 /// Decode the position number of a slice
 /// Returns a Vec<bool> filled with false for all uninteresting elements and true for all
 /// interesting elements.
 /// This Vec can be used a mapping of indices to interesting elements.
-pub fn decode_position(mut position: usize, num_interesting: usize, len: usize) -> Vec<bool> {
+pub fn decode_position<ToDecode: TryInto<usize>>(
+    position: ToDecode,
+    num_interesting: usize,
+    len: usize,
+) -> Result<Vec<bool>, ToDecode::Error> {
     let mut interesting_to_the_left = num_interesting;
-
+    let mut position = position.try_into()?;
     let mut result = (0..len)
         .rev()
         .map(|index| {
-            let cutoff = binomial(index, interesting_to_the_left - 1);
+            let cutoff = binomial(index, interesting_to_the_left - 1).into();
             if position < cutoff {
                 interesting_to_the_left -= 1;
                 true
@@ -48,7 +57,7 @@ pub fn decode_position(mut position: usize, num_interesting: usize, len: usize) 
         })
         .collect::<Vec<_>>();
     result.reverse();
-    result
+    Ok(result)
 }
 
 #[cfg(test)]
@@ -74,7 +83,7 @@ mod tests {
     #[test]
     fn test_encode_position() {
         for (data, position) in examples().iter() {
-            assert_eq!(*position, encode_position(data, &is_interesting));
+            assert_eq!(Ok(*position), encode_position(data, &is_interesting));
         }
     }
     #[test]
@@ -83,7 +92,7 @@ mod tests {
             let expected = data.iter().map(is_interesting).collect::<Vec<_>>();
             let num_interesting = expected.iter().filter(|x| **x).count();
             assert_eq!(
-                expected,
+                Ok(expected),
                 decode_position(*position, num_interesting, data.len())
             );
         }
