@@ -3,7 +3,12 @@ name = "natural_slice"
 version = "0.1.0"
 authors = ["Pierre Chevalier <pierrechevalier83@gmail.com>"]
 edition = "2018"
-
+description = "Encoding some properties of slices as natural numbers using Kociemba's alogrithms"
+readme = "readme.md"
+repository = "https://github.com/pierrechevalier83/natural_slice/"
+license = "GPL-3.0"
+keywords = ["rubiks", "encoding", "slice", "algorithm"]
+categories = ["encoding"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
