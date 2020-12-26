@@ -46,7 +46,11 @@ pub fn decode_position<ToDecode: TryInto<usize>>(
     let mut result = (0..len)
         .rev()
         .map(|index| {
-            let cutoff = binomial(index, interesting_to_the_left - 1).into();
+            let cutoff = if interesting_to_the_left > 0 {
+                binomial(index, interesting_to_the_left - 1).into()
+            } else {
+                0
+            };
             if position < cutoff {
                 interesting_to_the_left -= 1;
                 true

@@ -1,6 +1,6 @@
 use std::char::from_digit;
 use std::convert::{TryFrom, TryInto};
-use std::iter::once;
+use std::iter::{once, repeat};
 
 /// Encode a property of a slice of data with finite cardinality into a single number
 /// There must be a mapping from this property to a digit in a certain base
@@ -38,20 +38,26 @@ pub fn encode_property<T: Ord, Encoded: TryFrom<usize>>(
 pub fn decode_property<ToDecode: TryInto<usize>>(
     property: ToDecode,
     base: u8,
+    len: usize,
 ) -> Result<Vec<u8>, ToDecode::Error> {
     let property = property.try_into()?;
     let bits_string = format!("{}", radix_fmt::radix(property, base));
-    let last_digit = base
+    let last_digit = (base as u32
         - bits_string
             .chars()
-            .map(|c| c.to_digit(base as u32).unwrap() as u8)
-            .sum::<u8>()
-            % base;
-    Ok(bits_string
-        .chars()
-        .map(|c| c.to_digit(base as u32).unwrap() as u8)
+            .map(|c| c.to_digit(base as u32).unwrap())
+            .sum::<u32>()
+            % base as u32) as u8;
+    let ret = repeat(0)
+        .take(len - 1 - bits_string.len())
+        .chain(
+            bits_string
+                .chars()
+                .map(|c| c.to_digit(base as u32).unwrap() as u8),
+        )
         .chain(once(last_digit))
-        .collect())
+        .collect();
+    Ok(ret)
 }
 
 #[cfg(test)]
@@ -80,6 +86,6 @@ mod tests {
     }
     #[test]
     fn test_decode_property() {
-        assert_eq!(Ok(PROP.to_vec()), decode_property(1494, 3));
+        assert_eq!(Ok(PROP.to_vec()), decode_property(1494, 3, 8));
     }
 }
