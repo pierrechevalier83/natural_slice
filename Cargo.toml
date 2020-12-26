@@ -1,6 +1,6 @@
 [package]
 name = "natural_slice"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Pierre Chevalier <pierrechevalier83@gmail.com>"]
 edition = "2018"
 description = "Encoding some properties of slices as natural numbers using Kociemba's alogrithms"
