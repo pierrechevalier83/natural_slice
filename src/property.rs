@@ -47,7 +47,7 @@ pub fn decode_property<ToDecode: TryInto<usize>>(
             .chars()
             .map(|c| c.to_digit(base as u32).unwrap())
             .sum::<u32>()
-            % base as u32) as u8;
+            % base as u32) as u8 % base;
     let ret = repeat(0)
         .take(len - 1 - bits_string.len())
         .chain(
